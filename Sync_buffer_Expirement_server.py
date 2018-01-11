@@ -2,13 +2,14 @@
 #(for data packet) protocol code, session ID, Time Stamp, Flag, Payload Size
 #(for control packet) protocol code, session ID, Opcode, Payload size
 
-import socket               
+import socket  
+import time             
 
 data_packet = 0
 control_packet = 1
 SessionID = 5346245
 max_time = 2147483647
-time = 0
+
 fps = 60
 
 #code below generates data to be sent in test
@@ -22,7 +23,7 @@ def setFlag():
 #def make_time()
 
 
-def start_server(s, data, port = 12344):
+def start_server(s, data, port = 1232):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 
@@ -42,19 +43,24 @@ def start_server(s, data, port = 12344):
 
     # put the socket into listening mode
     s.listen(5)     
-    print("socket is listening")            
+    print("socket is listening")
 
     # a forever loop until we interrupt it or 
     # an error occurs
+    original_time = None            
     while True:
        # Establish connection with client.
        c, addr = s.accept()     
        print('Got connection from', addr)
-
-       print('data', data)
+       if (original_time == None):
+          original_time = time.time()
+       data_to_send = str(time.time() - original_time) + ',' +  data           
+       print('data', data_to_send)
 
        # send a thank you message to the client. 
-       c.send(data.encode('utf-8'))
+       c.send(data_to_send.encode('utf-8'))
+       data_to_send = str(time.time() - original_time) + ',' +  data           
+       c.send(data_to_send.encode('utf-8'))
 
        # Close the connection with the client
        c.close()                         
@@ -62,6 +68,7 @@ def start_server(s, data, port = 12344):
 
 s = socket.socket()
 data_gen = data_generator(time, fps)
+print(data_gen)
 start_server(s, data = data_gen)
 
 #stripped down synchronized reciever instance

@@ -2,7 +2,8 @@
 #(for data packet) protocol code, session ID, Time Stamp, Flag, Payload Size
 #(for control packet) protocol code, session ID, Opcode, Payload size
 import socket               
-
+import queue
+import time
 # Create a socket object
 
 
@@ -11,8 +12,12 @@ control_packet = 1
 SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
-time = 0
-fps = 60
+tick_length = 1
+e = 25
+timeout_time = 5
+original_time = None
+pqs=[]
+combined_pq = queue.PriorityQueue(maxsize = 2000)
 
 
 
@@ -31,17 +36,70 @@ def setFlag(time):
 #Assume negotiated time and encryption out of scope
 #sends packets via sockets instead of network for this expirament
 
-def recieve_data(port = 12344):
+class packet(object):
+    def __init__(self, time, data):
+    	self.time = time
+    	self.data = data
+    def __eq__(self, other):
+    	return self.time == other.time
+    def __ne__(self,other):
+    	return self.time != other.time
+    def __lt__(self,other):
+    	return self.time < other.time
+    def __le__(self,other):
+    	return self.time <= other.time
+    def __gt__(self,other):
+    	return self.time > other.time
+    def __ge__(self,other):
+    	return self.time >= other.time
+    def __repr__(self):
+    	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
+
+
+def recieve_data(port = 1232, original_time):
+    #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
     s.connect((server_ip, port))
-    print(s.recv(1024))
+    if original_time == None:
+        original_time = time.time()
+    pq = queue.PriorityQueue(maxsize = 2000)
+    pqs.append(pq)            
+    data = s.recv(1024)
+    print(data)
+    timestamp, packet_data = str(data).split(',')
+    print(timestamp)
+    time_diff = abs((time.time() - original_time) - float(timestamp[2:]))/tick_length
     # receive data from the server
-    print(s.recv(1024))
     # close the connection
-    s.close()                     
+    pq.add(packet(time_diff, data))
+    combined_pq.add(packet(time_diff, data))
+    s.close()
+    return original_time                     
+
+#only one queue here in current test
+def time_sync():
+    t = ()
+    while combined_pq.size > 0:
+        reference_queue = pqs.pop()
+        reference_packet = pq.pop()
+        timeout = time.time + timeout_time
+        for q in queues:
+             while timeout - time.time >= 0:
+                 q_packet = sync_packet(reference_packet, q)
+                 if q_packet != None:
+                      t.append(q_packet)
+    return t
 
 
-
+def sync_packet(reference_packet, queue):
+    for p in pq:
+    	if abs(p.time - reference_packet.time) <= e + tick_length:
+    		pq.remove(p)
+    		combined_pq.remove(p)
+    		return p
 s = socket.socket()
 recieve_data()
+recieve_data()
+time_sync()
+
 
