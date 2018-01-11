@@ -9,6 +9,8 @@ data_packet = 0
 control_packet = 1
 SessionID = 5346245
 max_time = 2147483647
+tick_length = 1
+
 
 fps = 60
 
@@ -59,7 +61,7 @@ def start_server(s, data, port = 1232):
 
        # send a thank you message to the client. 
        c.send(data_to_send.encode('utf-8'))
-       data_to_send = str(time.time() - original_time) + ',' +  data           
+       data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
        c.send(data_to_send.encode('utf-8'))
 
        # Close the connection with the client
