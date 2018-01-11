@@ -83,7 +83,7 @@ def time_sync():
         reference_queue = pqs.pop()
         reference_packet = pq.pop()
         timeout = time.time + timeout_time
-        for q in queues:
+        for q in pqs:
              if timeout - time.time >= 0:
                  q_packet = sync_packet(reference_packet, q)
                  if q_packet != None:
