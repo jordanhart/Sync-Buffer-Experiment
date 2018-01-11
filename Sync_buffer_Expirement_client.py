@@ -84,7 +84,7 @@ def time_sync():
         reference_packet = pq.pop()
         timeout = time.time + timeout_time
         for q in queues:
-             while timeout - time.time >= 0:
+             if timeout - time.time >= 0:
                  q_packet = sync_packet(reference_packet, q)
                  if q_packet != None:
                       t.append(q_packet)
