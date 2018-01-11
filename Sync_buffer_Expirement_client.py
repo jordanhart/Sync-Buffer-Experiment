@@ -56,7 +56,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1232, original_time):
+def recieve_data(port = 1235, original_time=None):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
     s.connect((server_ip, port))
@@ -68,23 +68,24 @@ def recieve_data(port = 1232, original_time):
     print(data)
     timestamp, packet_data = str(data).split(',')
     print(timestamp)
-    time_diff = abs((time.time() - original_time) - float(timestamp[2:]))/tick_length
+    timestamp = timestamp[2:] #gets rid of the b'
+    time_diff = abs((time.time() - original_time) - float(timestamp))/tick_length
     # receive data from the server
     # close the connection
-    pq.add(packet(time_diff, data))
-    combined_pq.add(packet(time_diff, data))
+    #pq.put(packet(time_diff, data))
+    combined_pq.put(packet(time_diff, data))
     s.close()
-    return original_time                     
+    return original_time, data                   
 
 #only one queue here in current test
 def time_sync():
     t = ()
-    while combined_pq.size > 0:
+    while combined_pq.qsize() > 0:
         reference_queue = pqs.pop()
-        reference_packet = pq.pop()
-        timeout = time.time + timeout_time
+        reference_packet = combined_pq.get()
+        timeout = time.time() + timeout_time
         for q in pqs:
-             if timeout - time.time >= 0:
+             if timeout - time.time() >= 0:
                  q_packet = sync_packet(reference_packet, q)
                  if q_packet != None:
                       t.append(q_packet)
@@ -99,7 +100,7 @@ def sync_packet(reference_packet, queue):
     		return p
 s = socket.socket()
 recieve_data()
-recieve_data()
+#recieve_data()
 time_sync()
 
 
