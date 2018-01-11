@@ -92,9 +92,9 @@ def time_sync():
 
 
 def sync_packet(reference_packet, queue):
-    for p in pq:
+    for p in queue:
     	if abs(p.time - reference_packet.time) <= e + tick_length:
-    		pq.remove(p)
+    		queue.remove(p)
     		combined_pq.remove(p)
     		return p
 s = socket.socket()
