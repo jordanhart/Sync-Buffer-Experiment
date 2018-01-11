@@ -65,9 +65,9 @@ def recieve_data(port = 1235, original_time=None):
     pq = queue.PriorityQueue(maxsize = 2000)
     pqs.append(pq)            
     data = s.recv(1024)
-    print(data)
+    print("data" , data)
     timestamp, packet_data = str(data).split(',')
-    print(timestamp)
+    print("timestamp" , timestamp)
     timestamp = timestamp[2:] #gets rid of the b'
     time_diff = abs((time.time() - original_time) - float(timestamp))/tick_length
     # receive data from the server
@@ -101,6 +101,7 @@ def sync_packet(reference_packet, queue):
 s = socket.socket()
 recieve_data()
 #recieve_data()
-time_sync()
+t = time_sync()
+print("tuples", t)
 
 
