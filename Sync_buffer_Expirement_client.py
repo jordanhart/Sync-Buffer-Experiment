@@ -14,7 +14,7 @@ max_time = 2147483647
 server_ip = '127.0.0.1'
 tick_length = 1
 e = 25
-timeout_time = 5
+timeout_time = 50000000000000000000000000000000000
 original_time = None
 pqs=[]
 combined_pq = queue.PriorityQueue(maxsize = 2000)
@@ -80,12 +80,17 @@ def recieve_data(port = 1235, original_time=None):
 #only one queue here in current test
 def time_sync():
     t = ()
+    if len(pqs) == 0:
+    	return t
+    if len(pqs) == 1:
+    	return list(pqs[0])
     while combined_pq.qsize() > 0:
         reference_queue = pqs.pop()
         reference_packet = combined_pq.get()
         timeout = time.time() + timeout_time
         for q in pqs:
-             if timeout - time.time() >= 0:
+            print("test")
+            if timeout - time.time() >= 0:
                  q_packet = sync_packet(reference_packet, q)
                  if q_packet != None:
                       t.append(q_packet)
