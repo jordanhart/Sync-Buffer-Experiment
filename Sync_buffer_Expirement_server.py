@@ -25,7 +25,7 @@ def setFlag():
 #def make_time()
 
 
-def start_server(s, data, port = 1235):
+def start_server(s, data, port = 1236):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 
@@ -56,7 +56,7 @@ def start_server(s, data, port = 1235):
        print('Got connection from', addr)
        if (original_time == None):
           original_time = time.time()
-       data_to_send = str(time.time() - original_time) + ',' +  data           
+       data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
        print('data', data_to_send)
 
        # send a thank you message to the client. 

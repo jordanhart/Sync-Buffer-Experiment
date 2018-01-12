@@ -18,17 +18,20 @@ timeout_time = 50000000000000000000000000000000000
 original_time = None
 pqs=[]
 combined_pq = queue.PriorityQueue(maxsize = 2000)
+fps = 60
+
 
 
 
 #code below generates data to be sent in test
 
 def data_generator(time, fps):
-	return [setFlag(time + i) for i in range(fps)]
-def setFlag(time):
+	return "100" * fps
+def setFlag():
      if time > max_time:
-     	return 1
+     	 return 1
      return 0
+
 #def make_time()
     
 
@@ -56,7 +59,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1235, original_time=None):
+def recieve_data(port = 1236, original_time=None):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
     s.connect((server_ip, port))
@@ -75,7 +78,7 @@ def recieve_data(port = 1235, original_time=None):
     #pq.put(packet(time_diff, data))
     combined_pq.put(packet(time_diff, data))
     s.close()
-    return original_time, data                   
+    return original_time                   
 
 #only one queue here in current test
 def time_sync():
@@ -96,16 +99,24 @@ def time_sync():
                       t.append(q_packet)
     return t
 
+def local_data(original_time=None):
+	data = data_generator(time, fps)
+	time_diff = (time.time() - original_time)/tick_length
+	pq = queue.PriorityQueue(maxsize = 2000)
+	pqs.append(pq)
+	combined_pq.put(packet(time_diff, data))
+	pq.put(packet(time_diff, data))
+	return data
 
 def sync_packet(reference_packet, queue):
-    for p in queue:
+    for p in queue.queue:
     	if abs(p.time - reference_packet.time) <= e + tick_length:
     		queue.remove(p)
     		combined_pq.remove(p)
     		return p
 s = socket.socket()
-recieve_data()
-#recieve_data()
+original_time = recieve_data()
+local_data(original_time)
 t = time_sync()
 print("tuples", t)
 
