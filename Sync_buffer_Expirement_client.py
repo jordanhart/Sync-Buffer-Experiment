@@ -72,7 +72,7 @@ def recieve_data(port = 1239, original_time=None):
     timestamp, packet_data = str(data).split(',')
     print("timestamp" , timestamp)
     timestamp = timestamp[2:] #gets rid of the b'
-    time_diff = (time.time() - original_time - float(timestamp))*tick_length
+    time_diff = (time.time() - original_time - float(timestamp))/tick_length
     # receive data from the server
     # close the connection
     #pq.put(packet(time_diff, data))

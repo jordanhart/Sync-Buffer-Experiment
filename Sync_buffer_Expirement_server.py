@@ -56,7 +56,7 @@ def start_server(s, data, port = 1239):
        print('Got connection from', addr)
        if (original_time == None):
           original_time = time.time()
-       data_to_send = str((time.time() - original_time)*tick_length) + ',' +  data           
+       data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
        print('data', data_to_send)
 
        # send a thank you message to the client. 
