@@ -13,7 +13,7 @@ SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
 tick_length = 1
-e = 25
+e = 2500000000000000
 timeout_time = 50000000000000000000000000000000000
 original_time = None
 pqs=[]
@@ -44,9 +44,9 @@ class packet(object):
     	self.time = time
     	self.data = data
     def __eq__(self, other):
-    	return self.time == other.time
+    	return other != None or  self.time == other.time
     def __ne__(self,other):
-    	return self.time != other.time
+    	return other == None or self.time != other.time
     def __lt__(self,other):
     	return self.time < other.time
     def __le__(self,other):
@@ -59,7 +59,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1236, original_time=None):
+def recieve_data(port = 1238, original_time=None):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
     s.connect((server_ip, port))
@@ -82,7 +82,7 @@ def recieve_data(port = 1236, original_time=None):
 
 #only one queue here in current test
 def time_sync():
-    t = ()
+    t = []
     if len(pqs) == 0:
     	return t
     if len(pqs) == 1:
@@ -92,7 +92,6 @@ def time_sync():
         reference_packet = combined_pq.get()
         timeout = time.time() + timeout_time
         for q in pqs:
-            print("test")
             if timeout - time.time() >= 0:
                  q_packet = sync_packet(reference_packet, q)
                  if q_packet != None:
@@ -100,24 +99,24 @@ def time_sync():
     return t
 
 def local_data(original_time=None):
+	if original_time == None:
+		original_time = time.time()
 	data = data_generator(time, fps)
 	time_diff = (time.time() - original_time)/tick_length
 	pq = queue.PriorityQueue(maxsize = 2000)
 	pqs.append(pq)
 	combined_pq.put(packet(time_diff, data))
 	pq.put(packet(time_diff, data))
-	return data
+	return original_time
 
 def sync_packet(reference_packet, queue):
     for p in queue.queue:
     	if abs(p.time - reference_packet.time) <= e + tick_length:
-    		queue.remove(p)
-    		combined_pq.remove(p)
+    		queue.get(p)
+    		combined_pq.get(p)
     		return p
 s = socket.socket()
-original_time = recieve_data()
-local_data(original_time)
+original_time = local_data()
+recieve_data(original_time=original_time)
 t = time_sync()
 print("tuples", t)
-
-

@@ -25,7 +25,7 @@ def setFlag():
 #def make_time()
 
 
-def start_server(s, data, port = 1236):
+def start_server(s, data, port = 1238):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 
