@@ -83,7 +83,7 @@ def time_sync():
     if len(pqs) == 0:
     	return t
     if len(pqs) == 1:
-    	return list(pqs[0])
+    	return list(pqs[0].queue)
     while combined_pq.qsize() > 0:
         reference_queue = pqs.pop()
         reference_packet = combined_pq.get()
