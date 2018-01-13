@@ -13,7 +13,7 @@ max_time = 2147483647
 tick_length = .0000001
 
 
-fps = [15,15,15]
+fps = [17,30,10]
 
 #code below generates data to be sent in test
 
@@ -32,7 +32,7 @@ def data_generator(original_time, fps):
 #def make_time()
 
 
-def start_server(s, port = 1243):
+def start_server(s, port = 1244):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 

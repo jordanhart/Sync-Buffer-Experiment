@@ -65,7 +65,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1243):
+def recieve_data(port = 1244):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 
