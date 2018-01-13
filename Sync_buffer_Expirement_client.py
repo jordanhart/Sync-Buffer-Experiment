@@ -105,8 +105,7 @@ def time_sync():
         		if timeout - time.time() >= 0:
         			q_packet = sync_packet(reference_packet, q)
         			if q_packet != None:
-        				t.append(reference_packet)
-        				t.append(q_packet)
+        				t.append((reference_packet, q_packet))
     return t
 
 def queue_not_empty(lst_queues):
@@ -137,5 +136,5 @@ original_time = recieve_data()
 local_data(original_time)
 t = time_sync()
 print("tuples: ", t)
-print("client total frames, including local and remote: ", len(t))
-print("client frames per second combining local and remote: ",len(t)/ (2 * len(fps)) )
+print("client total tuples of frames: ", len(t))
+print("client tuples of frames per second combining local and remote: ",len(t)/ (len(fps)) )
