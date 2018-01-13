@@ -19,7 +19,7 @@ e = .01
 timeout_time = 1
 original_time = None
 pqs=[]
-fps = 15
+fps = [15,15,15]
 
 
 
@@ -28,8 +28,9 @@ fps = 15
 
 def data_generator(original_time, fps):
   lst = []
-  for i in range(fps):
-    lst.append(((time.time()- original_time)//tick_length, "100"))
+  for f in fps:
+    for i in range(f):
+      lst.append(((time.time()- original_time)//tick_length, "100"))
   return lst
 # def setFlag():
 #      if time > max_time:

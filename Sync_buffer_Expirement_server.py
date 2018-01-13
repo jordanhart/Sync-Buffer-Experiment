@@ -13,14 +13,15 @@ max_time = 2147483647
 tick_length = .0000001
 
 
-fps = 60
+fps = [17,30,10]
 
 #code below generates data to be sent in test
 
 def data_generator(original_time, fps):
   lst = []
-  for i in range(fps):
-    lst.append(((time.time()- original_time)//tick_length, "100"))
+  for f in fps:
+    for i in range(f):
+      lst.append(((time.time()- original_time)//tick_length, "100"))
   return lst
 # def setFlag():
 #      if time > max_time:
