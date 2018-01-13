@@ -3,7 +3,8 @@
 #(for control packet) protocol code, session ID, Opcode, Payload size
 
 import socket  
-import time             
+import time    
+import json         
 
 data_packet = 0
 control_packet = 1
@@ -16,16 +17,19 @@ fps = 60
 
 #code below generates data to be sent in test
 
-def data_generator(time, fps):
-	return "100" * fps
-def setFlag():
-     if time > max_time:
-     	 return 1
-     return 0
+def data_generator(original_time, fps):
+  lst = []
+  for i in range(fps):
+    lst.append(((time.time()- original_time)/tick_length, "100"))
+  return lst
+# def setFlag():
+#      if time > max_time:
+#      	 return 1
+#      return 0
 #def make_time()
 
 
-def start_server(s, data, port = 1241):
+def start_server(s, port = 1241):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 
@@ -65,12 +69,13 @@ def start_server(s, data, port = 1241):
        # original_time = time.time() - int(t) * tick_length
        if (original_time == None):
           original_time = time.time()
-
        send_time(c)
-       data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
-       print('data', data_to_send)
+       data = data_generator(original_time, fps)
+       json_data = json.dumps(data)
+       print(json_data)
+       print('data', json_data)
        # send a thank you message to the client. 
-       c.send(data_to_send.encode('utf-8'))
+       c.send(json_data.encode('utf-8'))
        #data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
        #c.send(data_to_send.encode('utf-8'))
 
@@ -79,9 +84,7 @@ def start_server(s, data, port = 1241):
 
 
 s = socket.socket()
-data_gen = data_generator(time, fps)
-print(data_gen)
-start_server(s, data = data_gen)
+start_server(s)
 
 #stripped down synchronized reciever instance
 

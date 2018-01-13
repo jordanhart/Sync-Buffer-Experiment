@@ -4,6 +4,8 @@
 import socket               
 import queue
 import time
+import json
+
 # Create a socket object
 
 
@@ -25,12 +27,15 @@ fps = 60
 
 #code below generates data to be sent in test
 
-def data_generator(time, fps):
-	return "100" * fps
-def setFlag():
-     if time > max_time:
-     	 return 1
-     return 0
+def data_generator(original_time, fps):
+  lst = []
+  for i in range(fps):
+    lst.append(((time.time()- original_time)/tick_length, "100"))
+  return lst
+# def setFlag():
+#      if time > max_time:
+#      	 return 1
+#      return 0
 
 #def make_time()
     
@@ -67,23 +72,24 @@ def recieve_data(port = 1241):
     pqs.append(pq) 
     s.connect((server_ip, port))
     server_psuedo_time = float(str(s.recv(1024)).replace("'","").replace("b",""))
-    print(server_psuedo_time)
+    print("server psuedo_time",server_psuedo_time)
     original_time = time.time() - server_psuedo_time * tick_length
-    data = s.recv(1024)    
-
+    json_data = s.recv(4098)    
+    data = json.loads(json_data)
     #original_time = time.time()
-    print("data" , data)
-    timestamp, packet_data = str(data).split(',')
-    print("timestamp" , timestamp)
-    timestamp = float(timestamp.replace("'","").replace("b","")) #gets rid of the b'
-    time_diff = (time.time() - original_time)/tick_length - timestamp
+    #print("data" , data)
     # receive data from the server
     # close the connection
     #pq.put(packet(time_diff, data))
-    combined_pq.put(packet(time_diff, data))
-    s.close()
-    return original_time                   
+    add_packets_to_queue(pq, data)
+    add_packets_to_queue(combined_pq, data)
 
+    s.close()
+    return original_time           
+
+def add_packets_to_queue(queue, data):
+    for each_tuple in data:
+        queue.put(packet(each_tuple[0], each_tuple[1]))        
 #only one queue here in current test
 def time_sync():
     t = []
@@ -91,7 +97,7 @@ def time_sync():
     	return t
     if len(pqs) == 1:
     	return list(pqs[0].queue)
-    while combined_pq.qsize() > 0:
+    while len(pqs) > 0:
         reference_queue = pqs.pop()
         reference_packet = combined_pq.get()
         timeout = time.time() + timeout_time
@@ -103,14 +109,11 @@ def time_sync():
     return t
 
 def local_data(original_time=None):
-	if original_time == None:
-		original_time = time.time()
-	data = data_generator(time, fps)
-	time_diff = (time.time() - original_time)/tick_length
+	data = data_generator(original_time, fps)
 	pq = queue.PriorityQueue(maxsize = 2000)
-	pqs.insert(0,pq) #tuples empty without this. Why doesnt time_sync work when reference_queue isnt local queue?
-	combined_pq.put(packet(time_diff, data))
-	pq.put(packet(time_diff, data))
+	pqs.insert(0,pq)#tuples empty without this. Why doesnt time_sync work when reference_queue isnt local queue?
+	add_packets_to_queue(pq, data)
+	add_packets_to_queue(combined_pq, data)
 	return original_time
 
 def sync_packet(reference_packet, queue):
@@ -119,11 +122,11 @@ def sync_packet(reference_packet, queue):
     		queue.get(p)
     		combined_pq.get(p)
     		return p
+    	return None
 s = socket.socket()
 #original_time = recieve_data()
 #local_data(original_time)
 original_time = recieve_data()
 local_data(original_time)
-
 t = time_sync()
 print("tuples", t)
