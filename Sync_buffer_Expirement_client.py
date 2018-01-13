@@ -15,8 +15,8 @@ SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
 tick_length = 1
-e = 2500000000000000
-timeout_time = 50000000000000000000000000000000000
+e = 99999999999999999999999999999999999999999999999999999999999999999999999
+timeout_time = 99999999999999999999999999999999999999999999999999999999999999999999999
 original_time = None
 pqs=[]
 combined_pq = queue.PriorityQueue(maxsize = 2000)
@@ -99,13 +99,15 @@ def time_sync():
     	return list(pqs[0].queue)
     while len(pqs) > 0:
         reference_queue = pqs.pop()
+        print(reference_queue.qsize())
         reference_packet = combined_pq.get()
         timeout = time.time() + timeout_time
         for q in pqs:
             if timeout - time.time() >= 0:
                  q_packet = sync_packet(reference_packet, q)
+                 print(q_packet)
                  if q_packet != None:
-                      t.append(q_packet)
+                      t.extend(q_packet)
     return t
 
 def local_data(original_time=None):
@@ -117,12 +119,13 @@ def local_data(original_time=None):
 	return original_time
 
 def sync_packet(reference_packet, queue):
-    for p in queue.queue:
-    	if abs(p.time - reference_packet.time) <= e + tick_length:
-    		queue.get(p)
-    		combined_pq.get(p)
-    		return p
-    	return None
+	lst = []
+	for p in queue.queue:
+		if abs(p.time - reference_packet.time) <= e + tick_length:
+			queue.get(p)
+			combined_pq.get(p)
+			lst.append(p)
+	return lst
 s = socket.socket()
 #original_time = recieve_data()
 #local_data(original_time)
