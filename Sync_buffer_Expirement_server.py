@@ -25,7 +25,7 @@ def setFlag():
 #def make_time()
 
 
-def start_server(s, data, port = 1239):
+def start_server(s, data, port = 1241):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 
@@ -49,16 +49,26 @@ def start_server(s, data, port = 1239):
 
     # a forever loop until we interrupt it or 
     # an error occurs
-    original_time = None            
+    original_time = None  
+
+    def send_time(s):#s is a socket
+        psuedotime=(time.time() - original_time)/tick_length
+        s.send(str(psuedotime).encode("utf-8")) #sending current psuedotime
+        return original_time  
+
     while True:
        # Establish connection with client.
        c, addr = s.accept()     
        print('Got connection from', addr)
+       print('c', c)
+       # t = s.recv(1024)
+       # original_time = time.time() - int(t) * tick_length
        if (original_time == None):
           original_time = time.time()
+
+       send_time(c)
        data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
        print('data', data_to_send)
-
        # send a thank you message to the client. 
        c.send(data_to_send.encode('utf-8'))
        #data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           

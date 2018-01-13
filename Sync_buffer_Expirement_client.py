@@ -59,20 +59,24 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1239, original_time=None):
+def recieve_data(port = 1241):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
-    s.connect((server_ip, port))
-    if original_time == None:
-        original_time = time.time()
+
     pq = queue.PriorityQueue(maxsize = 2000)
-    pqs.append(pq)            
-    data = s.recv(1024)
+    pqs.append(pq) 
+    s.connect((server_ip, port))
+    server_psuedo_time = float(str(s.recv(1024)).replace("'","").replace("b",""))
+    print(server_psuedo_time)
+    original_time = time.time() - server_psuedo_time * tick_length
+    data = s.recv(1024)    
+
+    #original_time = time.time()
     print("data" , data)
     timestamp, packet_data = str(data).split(',')
     print("timestamp" , timestamp)
-    timestamp = timestamp[2:] #gets rid of the b'
-    time_diff = (time.time() - original_time - float(timestamp))/tick_length
+    timestamp = float(timestamp.replace("'","").replace("b","")) #gets rid of the b'
+    time_diff = (time.time() - original_time)/tick_length - timestamp
     # receive data from the server
     # close the connection
     #pq.put(packet(time_diff, data))
@@ -104,7 +108,7 @@ def local_data(original_time=None):
 	data = data_generator(time, fps)
 	time_diff = (time.time() - original_time)/tick_length
 	pq = queue.PriorityQueue(maxsize = 2000)
-	pqs.append(pq)
+	pqs.insert(0,pq) #tuples empty without this. Why doesnt time_sync work when reference_queue isnt local queue?
 	combined_pq.put(packet(time_diff, data))
 	pq.put(packet(time_diff, data))
 	return original_time
@@ -116,7 +120,10 @@ def sync_packet(reference_packet, queue):
     		combined_pq.get(p)
     		return p
 s = socket.socket()
-original_time = local_data()
-recieve_data(original_time=original_time)
+#original_time = recieve_data()
+#local_data(original_time)
+original_time = recieve_data()
+local_data(original_time)
+
 t = time_sync()
 print("tuples", t)
