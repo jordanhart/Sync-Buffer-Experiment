@@ -13,7 +13,7 @@ max_time = 2147483647
 tick_length = .0000001
 
 
-fps = [15,15]
+fps = [15,15,15]
 
 #code below generates data to be sent in test
 
