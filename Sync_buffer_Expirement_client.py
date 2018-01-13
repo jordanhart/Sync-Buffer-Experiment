@@ -15,7 +15,8 @@ SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
 tick_length = .0000001
-e = 10
+latency_time_allowed = 1 #second
+e = latency_time_allowed / tick_length
 timeout_time = 1
 original_time = None
 pqs=[]
@@ -125,7 +126,7 @@ def local_data(original_time=None):
 
 def sync_packet(reference_packet, queue):
 	for p in queue.queue:
-		if abs(p.time - reference_packet.time) <= e / tick_length:
+		if abs(p.time - reference_packet.time) <= e :
 			queue.get(p)
 			return p
 		else:
