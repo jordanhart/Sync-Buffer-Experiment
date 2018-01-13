@@ -98,16 +98,16 @@ def time_sync():
     if len(pqs) == 1:
     	return list(pqs[0].queue)
     while len(pqs) > 0:
-        reference_queue = pqs.pop()
-        print(reference_queue.qsize())
-        reference_packet = combined_pq.get()
-        timeout = time.time() + timeout_time
-        for q in pqs:
-            if timeout - time.time() >= 0:
-                 q_packet = sync_packet(reference_packet, q)
-                 print(q_packet)
-                 if q_packet != None:
-                      t.extend(q_packet)
+    	if (len(pqs) > 0):
+        	reference_queue = pqs.pop()
+        	print(reference_queue.qsize())
+        	reference_packet = combined_pq.get()
+        	timeout = time.time() + timeout_time
+        	for q in pqs:
+        		if timeout - time.time() >= 0:
+        			q_packet = sync_packet(reference_packet, q)
+        			if q_packet != None:
+        				t.extend(q_packet)
     return t
 
 def local_data(original_time=None):
