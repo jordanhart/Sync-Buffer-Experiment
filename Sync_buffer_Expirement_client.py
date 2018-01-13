@@ -104,7 +104,8 @@ def time_sync():
         		if timeout - time.time() >= 0:
         			q_packet = sync_packet(reference_packet, q)
         			if q_packet != None:
-        				t.extend(q_packet)
+        				t.append(reference_packet)
+        				t.append(q_packet)
     return t
 
 def queue_not_empty(lst_queues):
@@ -121,16 +122,13 @@ def local_data(original_time=None):
 	return original_time
 
 def sync_packet(reference_packet, queue):
-	lst = []
 	for p in queue.queue:
 		if abs(p.time - reference_packet.time) <= e + tick_length:
 			queue.get(p)
-			lst.append(reference_packet)
-			lst.append(p)
-
+			return p
 		else:
 			print("not here")
-	return lst #stores as list instead of streaming. Real implimentation will stream
+	return None
 s = socket.socket()
 #original_time = recieve_data()
 #local_data(original_time)
