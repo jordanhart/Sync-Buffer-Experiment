@@ -125,7 +125,9 @@ def sync_packet(reference_packet, queue):
 	for p in queue.queue:
 		if abs(p.time - reference_packet.time) <= e + tick_length:
 			queue.get(p)
+			lst.append(reference_packet)
 			lst.append(p)
+
 		else:
 			print("not here")
 	return lst #stores as list instead of streaming. Real implimentation will stream
