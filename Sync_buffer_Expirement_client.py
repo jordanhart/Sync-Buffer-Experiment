@@ -20,7 +20,7 @@ timeout_time = 99999999999999999999999999999999999999999999999999999999999999999
 original_time = None
 pqs=[]
 combined_pq = queue.PriorityQueue(maxsize = 2000)
-fps = 60
+fps = 15
 
 
 
@@ -97,8 +97,7 @@ def time_sync():
     	return t
     if len(pqs) == 1:
     	return list(pqs[0].queue)
-    while len(pqs) > 0:
-    	if (len(pqs) > 0):
+    while queue_not_empty(pqs) == True:
         	reference_queue = pqs.pop()
         	print(reference_queue.qsize())
         	reference_packet = combined_pq.get()
@@ -109,6 +108,12 @@ def time_sync():
         			if q_packet != None:
         				t.extend(q_packet)
     return t
+
+def queue_not_empty(lst_queues):
+	for q in lst_queues:
+		if q.qsize() > 0:
+			return True
+	return False
 
 def local_data(original_time=None):
 	data = data_generator(original_time, fps)
@@ -125,6 +130,8 @@ def sync_packet(reference_packet, queue):
 			queue.get(p)
 			combined_pq.get(p)
 			lst.append(p)
+		else:
+			print("not here")
 	return lst #stores as list instead of streaming. Real implimentation will stream
 s = socket.socket()
 #original_time = recieve_data()
