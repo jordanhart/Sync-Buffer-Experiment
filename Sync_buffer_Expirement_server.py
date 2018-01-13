@@ -13,7 +13,7 @@ max_time = 2147483647
 tick_length = .0000001
 
 
-fps = [17,30,10]
+fps = [15,15]
 
 #code below generates data to be sent in test
 
@@ -22,6 +22,8 @@ def data_generator(original_time, fps):
   for f in fps:
     for i in range(f):
       lst.append(((time.time()- original_time)//tick_length, "100"))
+      time.sleep(1/f)
+
   return lst
 # def setFlag():
 #      if time > max_time:
@@ -30,7 +32,7 @@ def data_generator(original_time, fps):
 #def make_time()
 
 
-def start_server(s, port = 1242):
+def start_server(s, port = 1243):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 

@@ -15,11 +15,11 @@ SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
 tick_length = .0000001
-e = .01
+e = 10
 timeout_time = 1
 original_time = None
 pqs=[]
-fps = [15,15,15]
+fps = [15,15]
 
 
 
@@ -31,6 +31,7 @@ def data_generator(original_time, fps):
   for f in fps:
     for i in range(f):
       lst.append(((time.time()- original_time)//tick_length, "100"))
+      time.sleep(1/f)
   return lst
 # def setFlag():
 #      if time > max_time:
@@ -64,7 +65,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1242):
+def recieve_data(port = 1243):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 
