@@ -10,7 +10,7 @@ data_packet = 0
 control_packet = 1
 SessionID = 5346245
 max_time = 2147483647
-tick_length = 1
+tick_length = .0000001
 
 
 fps = 60
@@ -20,7 +20,7 @@ fps = 60
 def data_generator(original_time, fps):
   lst = []
   for i in range(fps):
-    lst.append(((time.time()- original_time)/tick_length, "100"))
+    lst.append(((time.time()- original_time)//tick_length, "100"))
   return lst
 # def setFlag():
 #      if time > max_time:
@@ -56,7 +56,7 @@ def start_server(s, port = 1242):
     original_time = None  
 
     def send_time(s):#s is a socket
-        psuedotime=(time.time() - original_time)/tick_length
+        psuedotime=(time.time() - original_time)//tick_length
         s.send(str(psuedotime).encode("utf-8")) #sending current psuedotime
         return original_time  
 
@@ -76,7 +76,7 @@ def start_server(s, port = 1242):
        print('data', json_data)
        # send a thank you message to the client. 
        c.send(json_data.encode('utf-8'))
-       #data_to_send = str((time.time() - original_time)/tick_length) + ',' +  data           
+       #data_to_send = str((time.time() - original_time)//tick_length) + ',' +  data           
        #c.send(data_to_send.encode('utf-8'))
 
        # Close the connection with the client

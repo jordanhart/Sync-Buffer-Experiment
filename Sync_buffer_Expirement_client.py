@@ -14,7 +14,7 @@ control_packet = 1
 SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
-tick_length = 1
+tick_length = .0000001
 e = .01
 timeout_time = 1
 original_time = None
@@ -29,7 +29,7 @@ fps = 15
 def data_generator(original_time, fps):
   lst = []
   for i in range(fps):
-    lst.append(((time.time()- original_time)/tick_length, "100"))
+    lst.append(((time.time()- original_time)//tick_length, "100"))
   return lst
 # def setFlag():
 #      if time > max_time:
@@ -123,7 +123,7 @@ def local_data(original_time=None):
 
 def sync_packet(reference_packet, queue):
 	for p in queue.queue:
-		if abs(p.time - reference_packet.time) <= e + tick_length:
+		if abs(p.time - reference_packet.time) <= e / tick_length:
 			queue.get(p)
 			return p
 		else:
