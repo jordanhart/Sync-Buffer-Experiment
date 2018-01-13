@@ -125,7 +125,7 @@ def sync_packet(reference_packet, queue):
 			queue.get(p)
 			combined_pq.get(p)
 			lst.append(p)
-	return lst
+	return lst #stores as list instead of streaming. Real implimentation will stream
 s = socket.socket()
 #original_time = recieve_data()
 #local_data(original_time)
