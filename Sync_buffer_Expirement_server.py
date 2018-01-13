@@ -29,7 +29,7 @@ def data_generator(original_time, fps):
 #def make_time()
 
 
-def start_server(s, port = 1241):
+def start_server(s, port = 1242):
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 # next create a socket object
 

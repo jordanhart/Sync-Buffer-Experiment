@@ -19,7 +19,6 @@ e = 99999999999999999999999999999999999999999999999999999999999999999999999
 timeout_time = 99999999999999999999999999999999999999999999999999999999999999999999999
 original_time = None
 pqs=[]
-combined_pq = queue.PriorityQueue(maxsize = 2000)
 fps = 15
 
 
@@ -64,7 +63,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1241):
+def recieve_data(port = 1242):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 
@@ -82,7 +81,6 @@ def recieve_data(port = 1241):
     # close the connection
     #pq.put(packet(time_diff, data))
     add_packets_to_queue(pq, data)
-    add_packets_to_queue(combined_pq, data)
 
     s.close()
     return original_time           
@@ -97,10 +95,10 @@ def time_sync():
     	return t
     if len(pqs) == 1:
     	return list(pqs[0].queue)
-    while queue_not_empty(pqs) == True:
-        	reference_queue = pqs.pop()
-        	print(reference_queue.qsize())
-        	reference_packet = combined_pq.get()
+    #while queue_not_empty(pqs) == True:
+    reference_queue = pqs.pop()
+    while reference_queue.qsize() > 0:
+        	reference_packet = reference_queue.get()
         	timeout = time.time() + timeout_time
         	for q in pqs:
         		if timeout - time.time() >= 0:
@@ -120,7 +118,6 @@ def local_data(original_time=None):
 	pq = queue.PriorityQueue(maxsize = 2000)
 	pqs.insert(0,pq)#tuples empty without this. Why doesnt time_sync work when reference_queue isnt local queue?
 	add_packets_to_queue(pq, data)
-	add_packets_to_queue(combined_pq, data)
 	return original_time
 
 def sync_packet(reference_packet, queue):
@@ -128,7 +125,6 @@ def sync_packet(reference_packet, queue):
 	for p in queue.queue:
 		if abs(p.time - reference_packet.time) <= e + tick_length:
 			queue.get(p)
-			combined_pq.get(p)
 			lst.append(p)
 		else:
 			print("not here")
