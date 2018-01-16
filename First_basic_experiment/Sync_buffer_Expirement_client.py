@@ -15,12 +15,14 @@ SessionID = 5346245
 max_time = 2147483647
 server_ip = '127.0.0.1'
 tick_length = .0000001
-latency_time_allowed = 1 #second
+latency_time_allowed = .005 #second, target for ml models
 e = latency_time_allowed / tick_length
 timeout_time = 1
 original_time = None
 pqs=[]
-fps = [15,15]
+fps = [30, 30, 30]
+print("fps", fps)
+print("latency", str(latency_time_allowed) + " seconds")
 
 
 
@@ -66,7 +68,7 @@ class packet(object):
     	return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 
-def recieve_data(port = 1244):
+def recieve_data(port = 1252):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
 
