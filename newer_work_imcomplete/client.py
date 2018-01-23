@@ -90,8 +90,10 @@ class EchoClientProtocol:
         self.qs = {}
 
     def connection_made(self, transport):
+        print("udp connction made")
         self.transport = transport
         print('Send:', self.message)
+        self.transport.sendto("request data".encode())
 
     def datagram_received(self, data, addr):
         json_data =  data.decode()
@@ -112,11 +114,6 @@ class EchoClientProtocol:
         return int(message)
     def error_received(self, exc):
         print('Error received:', exc)
-
-    def connection_lost(self, exc):
-        print("Socket closed, stop the event loop")
-        loop = asyncio.get_event_loop()
-        # loop.stop()
 
 
 class ControllerClientProtocol(asyncio.Protocol):
@@ -153,10 +150,10 @@ coro = loop.create_connection(lambda: ControllerClientProtocol(message, loop),
                               '127.0.0.1', 8889)
 client = loop.run_until_complete(coro)
 loop.run_forever()
-# loop.close()
+loop.close()
 
 
-#loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 message = "Hello World!"
 connect = loop.create_datagram_endpoint(
     lambda: EchoClientProtocol(message, loop),
