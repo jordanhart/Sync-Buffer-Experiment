@@ -80,13 +80,12 @@ class packet(object):
         return "time" + ": "+str(self.time) + ", data: " + str(self.data)
 
 class EchoClientProtocol:
-    def __init__(self, message, original_time, loop, tick_length = 1):
+    def __init__(self, message, loop, tick_length = 1):
         self.message = message
         self.loop = loop
         self.transport = None
         self.connection_time = time.time()
         self.tick_length = tick_length
-        self.original_time = original_time
         self.sync_latency = {}
         self.qs = {}
 
@@ -95,7 +94,9 @@ class EchoClientProtocol:
         print('Send:', self.message)
 
     def datagram_received(self, data, addr):
-        message =  data.decode()
+        json_data =  data.decode()
+        message = json.loads(json_data)
+        print("recieved data", message)
         if addr not in self.qs.keys():
             self.qs[addr] = queue.PriorityQueue(maxsize = 2000)
             pqs.append(pq)
@@ -104,7 +105,7 @@ class EchoClientProtocol:
         add_packets_to_queue(self.qs[addr], original_message)
         time_sync()
         print("Close the socket")
-        self.transport.close()
+        # self.transport.close()
     def get_time():
         return (time.time() - original_time) // tick_length
     def get_time_from_message(message):
@@ -155,12 +156,12 @@ loop.run_forever()
 # loop.close()
 
 
-loop = asyncio.get_event_loop()
+#loop = asyncio.get_event_loop()
 message = "Hello World!"
 connect = loop.create_datagram_endpoint(
-    lambda: EchoClientProtocol(message, original_time, loop),
+    lambda: EchoClientProtocol(message, loop),
     remote_addr=('127.0.0.1', 9999))
 transport, protocol = loop.run_until_complete(connect)
-loop.run_forever()
+ # loop.run_forever()
 transport.close()
 loop.close()
