@@ -4,6 +4,8 @@ import asyncio as asyncio
 import time
 import queue
 import json
+import reedsolo
+
 
 pqs=[]
 fps = [30, 30, 30]
@@ -100,7 +102,8 @@ class EchoClientProtocol:
 
     def datagram_received(self, data, addr):
         global tuples
-        json_data =  data.decode()
+        rs = reedsolo.RSCodec(10)
+        json_data =  rs.decode(data)
         original_message = json.loads(json_data)
         print("recieved data", message)
         if addr not in self.qs.keys():

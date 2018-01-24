@@ -3,6 +3,7 @@
 import asyncio
 import time
 import json
+import reedsolo
 
 pqs=[]
 fps = [30, 30, 30]
@@ -16,7 +17,7 @@ def data_generator(original_time, fps):
   lst = []
   for f in fps:
     for i in range(f):
-      lst.append(((time.time()- original_time)//tick_length, "100"))
+      lst.append([int((time.time()- original_time))//tick_length, 100])
       time.sleep(1/f)
   return lst
 
@@ -33,7 +34,9 @@ class EchoServerProtocol:
         message = data.decode()
         print('Received %r from %s' % (message, addr))
         print("sending json_data", json_data)
-        self.transport.sendto(json_data.encode(), addr)
+        rs = reedsolo.RSCodec(10)
+        reed_data = rs.encode(json_data)
+        self.transport.sendto(reed_data, addr)
         # print('Received %r from %s' % (message, addr))
         # print('Send %r to %s' % (message, addr))
         # self.transport.sendto(data, addr)
@@ -59,6 +62,7 @@ class EchoServerControllerProtocol(asyncio.Protocol):
         # self.transport.write(data)
         data = data_generator(original_time, fps)
         json_data = json.dumps(data)
+        print("json_data", json_data)
         print("json_data in control server not None: ", json_data!= None)
         
         print('Close the client socket')
