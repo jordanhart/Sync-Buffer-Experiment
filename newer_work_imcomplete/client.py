@@ -8,6 +8,8 @@ import json
 pqs=[]
 fps = [30, 30, 30]
 tick_length = 1
+timeout_time = 5
+e = 1
 
 def data_generator(original_time, fps):
   lst = []
@@ -97,15 +99,14 @@ class EchoClientProtocol:
 
     def datagram_received(self, data, addr):
         json_data =  data.decode()
-        message = json.loads(json_data)
+        original_message = json.loads(json_data)
         print("recieved data", message)
         if addr not in self.qs.keys():
             self.qs[addr] = queue.PriorityQueue(maxsize = 2000)
-            pqs.append(pq)
-        json_data = s.recv(4098)
-        original_message = json.loads(json_data)
+            pqs.append(self.qs[addr])
+        print("recieved data")
         add_packets_to_queue(self.qs[addr], original_message)
-        time_sync()
+        print("tuples" ,time_sync())
         print("Close the socket")
         # self.transport.close()
     def get_time():
@@ -154,11 +155,11 @@ loop.close()
 
 
 loop = asyncio.new_event_loop()
-message = "Hello World!"
+message = "udp message!"
 connect = loop.create_datagram_endpoint(
     lambda: EchoClientProtocol(message, loop),
     remote_addr=('127.0.0.1', 9999))
 transport, protocol = loop.run_until_complete(connect)
- # loop.run_forever()
+loop.run_forever()
 transport.close()
 loop.close()

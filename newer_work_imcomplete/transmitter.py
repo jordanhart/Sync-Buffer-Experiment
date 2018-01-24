@@ -32,6 +32,7 @@ class EchoServerProtocol:
     def datagram_received(self, data, addr):
         message = data.decode()
         print('Received %r from %s' % (message, addr))
+        print("sending json_data", json_data)
         self.transport.sendto(json_data.encode(), addr)
         # print('Received %r from %s' % (message, addr))
         # print('Send %r to %s' % (message, addr))
