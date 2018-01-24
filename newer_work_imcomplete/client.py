@@ -10,6 +10,7 @@ fps = [30, 30, 30]
 tick_length = 1
 timeout_time = 5
 e = 1
+tuples = None
 
 def data_generator(original_time, fps):
   lst = []
@@ -98,6 +99,7 @@ class EchoClientProtocol:
         self.transport.sendto("request data".encode())
 
     def datagram_received(self, data, addr):
+        global tuples
         json_data =  data.decode()
         original_message = json.loads(json_data)
         print("recieved data", message)
@@ -106,7 +108,8 @@ class EchoClientProtocol:
             pqs.append(self.qs[addr])
         print("recieved data")
         add_packets_to_queue(self.qs[addr], original_message)
-        print("tuples" ,time_sync())
+        tuples = time_sync()
+        analyze_tuples(tuples)
         print("Close the socket")
         # self.transport.close()
     def get_time():
@@ -144,6 +147,12 @@ class ControllerClientProtocol(asyncio.Protocol):
         print('The server closed the connection')
         print('Stop the event loop')
         self.loop.stop()
+def analyze_tuples(t):
+    print("tuples: ", t)
+    print("client total tuples of frames: ", len(t))
+    print("client tuples of frames per second combining local and remote: ",len(t)/ (len(fps)))
+
+
 original_time = None
 loop = asyncio.get_event_loop()
 message = 'Hello World!'
@@ -163,3 +172,5 @@ transport, protocol = loop.run_until_complete(connect)
 loop.run_forever()
 transport.close()
 loop.close()
+
+
