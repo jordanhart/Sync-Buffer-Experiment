@@ -17,11 +17,12 @@ time_delay_client_timestamps = 0
 def data_generator(original_time, fps):
   current_time = time.time()
   lst = []
+  append = lst.append
   for index in range(len(fps)):
     f = fps[index]
     for i in range(f):
       #use i/f instead of wait(1/f) after list append for code to run faster
-      lst.append([int((current_time + index - original_time + i/f + time_delay_client_timestamps))//tick_length, 100])
+      append([int((current_time + index - original_time + i/f + time_delay_client_timestamps))//tick_length, 100])
   return lst
 
 def local_data(original_time=None):
@@ -38,11 +39,12 @@ def time_sync():
         return list(pqs[0].queue)
     #while queue_not_empty(pqs) == True:
     reference_queue = pqs.pop()
+    times = time.time
     while reference_queue.qsize() > 0:
             reference_packet = reference_queue.get()
-            timeout = time.time() + timeout_time
+            timeout = times() + timeout_time
             for q in pqs:
-                if timeout - time.time() >= 0:
+                if timeout - times() >= 0:
                     q_packet = sync_packet(reference_packet, q)
                     if q_packet != None:
                         t.append((reference_packet, q_packet))
@@ -62,8 +64,9 @@ def sync_packet(reference_packet, queue):
     return None
 
 def add_packets_to_queue(queue, data):
+    put = queue.put
     for each_tuple in data:
-        queue.put(packet(each_tuple[0], each_tuple[1]))        
+        put(packet(each_tuple[0], each_tuple[1]))        
 #only one queue here in current test
 
 class packet(object):
@@ -96,7 +99,7 @@ class EchoClientProtocol:
         self.qs = {}
 
     def connection_made(self, transport):
-        print("udp connction made")
+        # print("udp connction made")
         self.transport = transport
         # print('Send:', self.message)
         self.transport.sendto("request data".encode())
@@ -112,11 +115,11 @@ class EchoClientProtocol:
         if addr not in self.qs.keys():
             self.qs[addr] = queue.PriorityQueue(maxsize = 2000)
             pqs.append(self.qs[addr])
-        print("recieved data")
+        # print("recieved data")
         add_packets_to_queue(self.qs[addr], original_message)
         tuples = time_sync()
         analyze_tuples(tuples)
-        print("Close the socket")
+        # print("Close the socket")
         # self.transport.close()
     def get_time():
         return (time.time() - original_time) // tick_length
@@ -159,7 +162,7 @@ class ControllerClientProtocol(asyncio.Protocol):
         self.loop.stop()
 def analyze_tuples(t):
     # print("tuples: ", t)
-    print("client total tuples of frames: ", len(t))
+    # print("client total tuples of frames: ", len(t))
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
     print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
     print("seconds since recieved data: ", time.time() - time_data_recieved_start)
