@@ -8,9 +8,10 @@ import reedsolo
 
 
 fps = [30, 30, 30]
-tick_length = 1
 timeout_time = 5
-e = 1
+tick_length = .0000001
+latency_time_allowed = .01 #second, target for ml models
+e = latency_time_allowed / tick_length
 time_delay_client_timestamps = 0
 
 def data_generator(original_time, fps):
@@ -54,6 +55,8 @@ def queue_not_empty(lst_queues):
     return False
 def sync_packet(reference_packet, queue):
     for p in queue.queue:
+        print("time diff: ", abs(p.time - reference_packet.time))
+        print("e", e)
         if abs(p.time - reference_packet.time) <= e :
             queue.get(p)
             return p
@@ -147,7 +150,7 @@ class ControllerClientProtocol(asyncio.Protocol):
         print(message)
         psuedo_time = float(message)
         latency = (time.time() - self.sync_time) / 2
-        original_time = (time.time()- latency - psuedo_time)
+        original_time = ((time.time()- latency)//tick_length - psuedo_time) * tick_length
         local_data(original_time)
         time_timesync_ended = time.time()
         self.transport.close()
@@ -161,9 +164,9 @@ def analyze_tuples(t):
     print("tuples: ", t)
     print("client total tuples of frames: ", len(t))
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
+    print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
     print("seconds since recieved data: ", time.time() - time_data_recieved_start)
     print("seconds for experiment to run", time.time() - protocol_start_time)
-    print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
 
 
 pqs=[]

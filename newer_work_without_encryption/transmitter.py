@@ -7,10 +7,9 @@ import reedsolo
 
 pqs=[]
 fps = [30, 30, 30]
-tick_length = 1
+tick_length = .0000001
 time_delay_transmitter_timestamps = 0
 network_delay_transmitter_to_client_over_udp = 0
-
 data = None
 json_data = None
 
