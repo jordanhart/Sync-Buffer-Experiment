@@ -65,8 +65,10 @@ def sync_packet(reference_packet, queue):
 
 def add_packets_to_queue(queue, data):
     put = queue.put
-    for each_tuple in data:
-        put(packet(each_tuple[0], each_tuple[1]))        
+    p = lambda t: packet(t[0], t[1])
+    packets = map(p, data)
+    for pack in packets:
+        put(pack)        
 #only one queue here in current test
 
 class packet(object):
@@ -95,7 +97,6 @@ class EchoClientProtocol:
         self.transport = None
         self.connection_time = time.time()
         self.tick_length = tick_length
-        self.sync_latency = {}
         self.qs = {}
 
     def connection_made(self, transport):
@@ -105,7 +106,6 @@ class EchoClientProtocol:
         self.transport.sendto("request data".encode())
 
     def datagram_received(self, data, addr):
-        global tuples
         global time_data_recieved_start
         time_data_recieved_start = time.time()
         rs = reedsolo.RSCodec(10)
@@ -163,16 +163,15 @@ class ControllerClientProtocol(asyncio.Protocol):
 def analyze_tuples(t):
     # print("tuples: ", t)
     # print("client total tuples of frames: ", len(t))
-    print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
-    print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
     print("seconds since recieved data: ", time.time() - time_data_recieved_start)
+    print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
     print("seconds for experiment to run", time.time() - protocol_start_time)
+    print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
 
 
 pqs=[]
 original_time = None
 time_data_recieved_start = None
-tuples = None
 time_timesync_ended = None
 time_timesync_started = None
 protocol_start_time = time.time()
