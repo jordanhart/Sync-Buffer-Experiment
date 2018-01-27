@@ -7,7 +7,7 @@ import reedsolo
 
 pqs=[]
 fps = [30, 30, 30]
-tick_length = .0000001
+tick_length = .01
 time_delay_transmitter_timestamps = 0
 network_delay_transmitter_to_client_over_udp = 0
 data = None
@@ -61,13 +61,13 @@ class EchoServerControllerProtocol(asyncio.Protocol):
         message = data.decode()
         if (self.request_to_sync_message(message)):
             self.transport.write(str((time.time() - original_time)//self.tick_length).encode())
-        print('Data received: {!r}'.format(message))
+        # print('Data received: {!r}'.format(message))
 
-        print('Send: {!r}'.format(message))
+        # print('Send: {!r}'.format(message))
         # self.transport.write(data)
         data = data_generator(original_time, fps)
         json_data = json.dumps(data)
-        print("json_data", json_data)
+        # print("json_data", json_data)
         print("json_data in control server not None: ", json_data!= None)
         
         print('Close the client socket')

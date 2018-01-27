@@ -9,7 +9,7 @@ import reedsolo
 
 fps = [30, 30, 30]
 timeout_time = 5
-tick_length = .0000001
+tick_length = .01
 latency_time_allowed = .01 #second, target for ml models
 e = latency_time_allowed / tick_length
 time_delay_client_timestamps = 0
@@ -55,13 +55,10 @@ def queue_not_empty(lst_queues):
     return False
 def sync_packet(reference_packet, queue):
     for p in queue.queue:
-        print("time diff: ", abs(p.time - reference_packet.time))
-        print("e", e)
         if abs(p.time - reference_packet.time) <= e :
             queue.get(p)
             return p
-        else:
-            print("not here")
+    print("did not sync data")
     return None
 
 def add_packets_to_queue(queue, data):
@@ -101,7 +98,7 @@ class EchoClientProtocol:
     def connection_made(self, transport):
         print("udp connction made")
         self.transport = transport
-        print('Send:', self.message)
+        # print('Send:', self.message)
         self.transport.sendto("request data".encode())
 
     def datagram_received(self, data, addr):
@@ -111,7 +108,7 @@ class EchoClientProtocol:
         rs = reedsolo.RSCodec(10)
         json_data =  rs.decode(data)
         original_message = json.loads(json_data)
-        print("recieved data", message)
+        # print("recieved data", message)
         if addr not in self.qs.keys():
             self.qs[addr] = queue.PriorityQueue(maxsize = 2000)
             pqs.append(self.qs[addr])
@@ -147,7 +144,7 @@ class ControllerClientProtocol(asyncio.Protocol):
     def data_received(self, data):
         global time_timesync_ended
         message = data.decode()
-        print(message)
+        # print(message)
         psuedo_time = float(message)
         latency = (time.time() - self.sync_time) / 2
         original_time = ((time.time()- latency)//tick_length - psuedo_time) * tick_length
@@ -161,7 +158,7 @@ class ControllerClientProtocol(asyncio.Protocol):
         print('Stop the event loop')
         self.loop.stop()
 def analyze_tuples(t):
-    print("tuples: ", t)
+    # print("tuples: ", t)
     print("client total tuples of frames: ", len(t))
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
     print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
