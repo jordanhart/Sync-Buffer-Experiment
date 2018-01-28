@@ -37,9 +37,9 @@ def time_sync():
         return t
     if len(pqs) == 1:
         return list(pqs[0].queue)
-    #while queue_not_empty(pqs) == True:
     reference_queue = pqs.pop()
     times = time.time
+    append = t.append
     while reference_queue.qsize() > 0:
             reference_packet = reference_queue.get()
             timeout = times() + timeout_time
@@ -47,7 +47,7 @@ def time_sync():
                 if timeout - times() >= 0:
                     q_packet = sync_packet(reference_packet, q)
                     if q_packet != None:
-                        t.append((reference_packet, q_packet))
+                        append((reference_packet, q_packet))
     return t
 
 def queue_not_empty(lst_queues):
@@ -156,8 +156,8 @@ class ControllerClientProtocol(asyncio.Protocol):
         psuedo_time = float(message)
         latency = (time.time() - self.sync_time) / 2
         original_time = ((time.time()- latency)//tick_length - psuedo_time) * tick_length
-        local_data(original_time)
         time_timesync_ended = time.time()
+        local_data(original_time)
         self.transport.close()
 
 
