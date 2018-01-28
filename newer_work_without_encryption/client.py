@@ -173,14 +173,14 @@ class ControllerClientProtocol(asyncio.Protocol):
         print('The server closed the connection')
         print('Stop the event loop')
         self.loop.stop()
-def analyze_tuples(t, time, time_data_recieved_start, time_data_recieved_and_loaded, time_packet_sync_start):
+def analyze_tuples(t, end_time, time_data_recieved_start, time_data_recieved_and_loaded, time_packet_sync_start):
     # print("tuples: ", t)
     # print("client total tuples of frames: ", len(t))
-    print("seconds since recieved data: ", time - time_data_recieved_start)
+    print("seconds since recieved data: ", end_time - time_data_recieved_start)
     print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
-    print("seconds from udp connection made to data transfered, loaded in original form, and in queue: ", time - udp_time_start)
-    print("time for packet sync code to run :", time - time_packet_sync_start)
-    print("seconds for experiment to run", time - protocol_start_time)
+    print("seconds from udp connection made to data transfered, loaded in original form, and in queue: ", end_time - udp_time_start)
+    print("time for packet sync code to run :", end_time - time_packet_sync_start)
+    print("seconds for experiment to run", end_time - protocol_start_time)
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
 
 
