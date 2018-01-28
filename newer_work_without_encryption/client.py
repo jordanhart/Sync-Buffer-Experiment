@@ -176,10 +176,12 @@ class ControllerClientProtocol(asyncio.Protocol):
 def analyze_tuples(t, end_time, time_data_recieved_start, time_data_recieved_and_loaded, time_packet_sync_start):
     # print("tuples: ", t)
     # print("client total tuples of frames: ", len(t))
-    print("seconds since recieved data: ", end_time - time_data_recieved_start)
     print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
-    print("seconds from udp connection made to data transfered, loaded in original form, and in queue: ", end_time - udp_time_start)
-    print("time for packet sync code to run :", end_time - time_packet_sync_start)
+    print("seconds since recieved data to packets being synced: ", end_time - time_data_recieved_start)
+    print("seconds from udp connection made to data transfered, loaded in original form, and in queue: ", time_data_recieved_and_loaded - udp_time_start)
+    print("seconds from udp connection made to data recieved : ", time_data_recieved_start - udp_time_start)
+    print("seconds from udp data transfered to data in queue : ", time_data_recieved_and_loaded - time_data_recieved_start)
+    print("seconds for packet sync code to run :", end_time - time_packet_sync_start)
     print("seconds for experiment to run", end_time - protocol_start_time)
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
 
