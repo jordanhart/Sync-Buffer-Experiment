@@ -22,7 +22,7 @@ def data_generator(original_time, fps):
     f = fps[index]
     for i in range(f):
       #use i/f instead of wait(1/f) after list append for code to run faster
-      lst.append([int((current_time + index - original_time + i/f + time_delay_transmitter_timestamps))//tick_length, 100])
+      lst.append([(current_time + index - original_time + i/f + time_delay_transmitter_timestamps)//tick_length, 100])
   return lst
 
 
@@ -32,7 +32,7 @@ class EchoServerProtocol:
         self.connection_made_time = time.time() // tick_length
         self.tick_length = tick_length
         self.original_time = {}
-        print("json_data in echoserver not None", json_data != None)
+        # print("json_data in echoserver not None", json_data != None)
 
     def datagram_received(self, data, addr):
         message = data.decode()
@@ -53,7 +53,7 @@ class EchoServerProtocol:
 class EchoServerControllerProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         peername = transport.get_extra_info('peername')
-        print('Connection from {}'.format(peername))
+        # print('Connection from {}'.format(peername))
         self.transport = transport
         self.tick_length = tick_length
 
@@ -69,9 +69,9 @@ class EchoServerControllerProtocol(asyncio.Protocol):
         data = data_generator(original_time, fps)
         json_data = json.dumps(data)
         # print("json_data", json_data)
-        print("json_data in control server not None: ", json_data!= None)
+        # print("json_data in control server not None: ", json_data!= None)
         
-        print('Close the client socket')
+        # print('Close the client socket')
         self.transport.close()
     def connection_lost(self, exc):
         # The socket has been closed, stop the event loop
@@ -82,37 +82,43 @@ class EchoServerControllerProtocol(asyncio.Protocol):
         # self.transport.close()
     def request_to_sync_message(self, message):
         return message == "request to sync time"
-original_time = time.time()
-loop = asyncio.get_event_loop()
-print("starting tcp server")
-# Each client connection will create a new protocol instance
-coro = loop.create_server(EchoServerControllerProtocol, '127.0.0.1', 8889)
-server = loop.run_until_complete(coro)
 
-# Serve requests until Ctrl+C is pressed
-# print('Serving on {}'.format(server.sockets[0].getsockname()))
-try:
-    loop.run_forever()
-except KeyboardInterrupt:
-    pass
+def start_server():
+   global original_time
+   global loop
+   original_time = time.time()
+   loop = asyncio.get_event_loop()
+   # print("starting tcp server")
+   # Each client connection will create a new protocol instance
+   coro = loop.create_server(EchoServerControllerProtocol, '127.0.0.1', 8889)
+   server = loop.run_until_complete(coro)
 
-# # Close the server
-server.close()
-loop.run_until_complete(server.wait_closed())
-loop.close()
+   # Serve requests until Ctrl+C is pressed
+   # print('Serving on {}'.format(server.sockets[0].getsockname()))
+   try:
+       loop.run_forever()
+   except KeyboardInterrupt:
+       pass
 
-loop = asyncio.new_event_loop()
-print("Starting UDP server")
-# One protocol instance will be created to serve all client requests
+   # # Close the server
+   server.close()
+   loop.run_until_complete(server.wait_closed())
+   # loop.close()
 
-listen = loop.create_datagram_endpoint(
-    EchoServerProtocol, local_addr=('127.0.0.1', 9999))
-transport, protocol = loop.run_until_complete(listen)
+   # loop = asyncio.new_event_loop()
+   # print("Starting UDP server")
+   # One protocol instance will be created to serve all client requests
 
-try:
-    loop.run_forever()
-except KeyboardInterrupt:
-    pass
+   listen = loop.create_datagram_endpoint(
+       EchoServerProtocol, local_addr=('127.0.0.1', 9999))
+   transport, protocol = loop.run_until_complete(listen)
 
-transport.close()
-loop.close()
+   try:
+       loop.run_forever()
+   except KeyboardInterrupt:
+       pass
+
+   transport.close()
+   # loop.close()
+   # start_server()
+start_server()

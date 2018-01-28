@@ -22,7 +22,7 @@ def data_generator(original_time, fps):
     f = fps[index]
     for i in range(f):
       #use i/f instead of wait(1/f) after list append for code to run faster
-      append([int((current_time + index - original_time + i/f + time_delay_client_timestamps))//tick_length, 100])
+      append([((current_time + index - original_time + i/f + time_delay_client_timestamps))//tick_length, 100])
   return lst
 
 def local_data(original_time=None):
@@ -120,13 +120,18 @@ class EchoClientProtocol:
         tuples = time_sync()
         analyze_tuples(tuples)
         # print("Close the socket")
-        # self.transport.close()
+        self.transport.close()
     def get_time():
         return (time.time() - original_time) // tick_length
     def get_time_from_message(message):
         return int(message)
     def error_received(self, exc):
         print('Error received:', exc)
+    def connection_lost(self, exc):
+        print('The server closed the connection')
+        print('Stop the event loop')
+        self.loop.stop()
+
 
 
 class ControllerClientProtocol(asyncio.Protocol):
@@ -185,10 +190,10 @@ coro = loop.create_connection(lambda: ControllerClientProtocol(message, loop),
                               '127.0.0.1', 8889)
 client = loop.run_until_complete(coro)
 loop.run_forever()
-loop.close()
+# loop.close()
 
 
-loop = asyncio.new_event_loop()
+# loop = asyncio.new_event_loop()
 message = "udp message!"
 udp_time_start = time.time()
 connect = loop.create_datagram_endpoint(
