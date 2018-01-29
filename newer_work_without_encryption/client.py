@@ -113,10 +113,11 @@ class EchoClientProtocol:
         global time_data_recieved_and_loaded
         time_data_recieved_start = time.time()
         rs = reedsolo.RSCodec(10)
+        time_fec_starts = time.time()
         json_data =  rs.decode(data)
+        time_json_start = time.time()
         original_message = json.loads(json_data)
         time_for_fec_and_dejson_end = time.time()
-        # print("recieved data", message)
         if addr not in self.qs.keys():
             self.qs[addr] = queue.PriorityQueue(maxsize = 2000)
             pqs.append(self.qs[addr])
@@ -126,7 +127,9 @@ class EchoClientProtocol:
         time_packet_sync_start = time.time()
         tuples = time_sync()
         end_time = time.time()
-        analyze_tuples(tuples, end_time, time_data_recieved_start, time_data_recieved_and_loaded, time_packet_sync_start)
+        analyze_tuples(tuples, end_time, time_data_recieved_start, \
+            time_data_recieved_and_loaded, time_packet_sync_start, \
+            time_for_fec_and_dejson_end, time_fec_starts, time_json_start)
         # print("Close the socket")
         self.transport.close()
     def get_time():
@@ -173,7 +176,9 @@ class ControllerClientProtocol(asyncio.Protocol):
         print('The server closed the connection')
         print('Stop the event loop')
         self.loop.stop()
-def analyze_tuples(t, end_time, time_data_recieved_start, time_data_recieved_and_loaded, time_packet_sync_start):
+def analyze_tuples(t, end_time, time_data_recieved_start, \
+    time_data_recieved_and_loaded, time_packet_sync_start, \
+    time_for_fec_and_dejson_end, time_fec_starts, time_json_start):
     # print("tuples: ", t)
     # print("client total tuples of frames: ", len(t))
     print("seconds took for time handshake: ", time_timesync_ended - time_timesync_started)
@@ -181,6 +186,8 @@ def analyze_tuples(t, end_time, time_data_recieved_start, time_data_recieved_and
     print("seconds from udp connection made to data transfered, loaded in original form, and in queue: ", time_data_recieved_and_loaded - udp_time_start)
     print("seconds from udp connection made to data recieved : ", time_data_recieved_start - udp_time_start)
     print("seconds from udp data transfered to data in queue : ", time_data_recieved_and_loaded - time_data_recieved_start)
+    print("time json: ", time_for_fec_and_dejson_end - time_json_start)
+    print("time fec: ", time_json_start - time_fec_starts)
     print("seconds for packet sync code to run :", end_time - time_packet_sync_start)
     print("seconds for experiment to run", end_time - protocol_start_time)
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
