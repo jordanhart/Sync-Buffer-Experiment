@@ -7,7 +7,7 @@ import reedsolo
 
 
 pqs=[]
-fps = [30, 30, 30]
+fps = [21, 40, 30]
 tick_length = .01
 time_delay_transmitter_timestamps = 0
 network_delay_transmitter_to_client_over_udp = 0
@@ -39,6 +39,8 @@ class EchoServerProtocol:
         message = data.decode()
         # print('Received %r from %s' % (message, addr))
         # print("sending json_data", json_data)
+        data = data_generator(original_time, fps)
+        json_data = json.dumps(data).encode()
         if (fec > 0):
             rs = reedsolo.RSCodec(fec)
             reed_data = rs.encode(json_data)
@@ -72,8 +74,6 @@ class EchoServerControllerProtocol(asyncio.Protocol):
 
         # print('Send: {!r}'.format(message))
         # self.transport.write(data)
-        data = data_generator(original_time, fps)
-        json_data = json.dumps(data).encode()
         # print("json_data", json_data)
         # print("json_data in control server not None: ", json_data!= None)
         

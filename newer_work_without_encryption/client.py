@@ -6,11 +6,12 @@ import queue
 import json
 import reedsolo
 
+protocol_start_time = time.time()
 
 fps = [30, 30, 30]
 timeout_time = 5
 tick_length = .01
-latency_time_allowed = .05 #second, target for ml models
+latency_time_allowed = .020 #second, target for ml models
 e = latency_time_allowed / tick_length
 time_delay_client_timestamps = 0
 fec = 0
@@ -114,7 +115,6 @@ class EchoClientProtocol:
         global time_data_recieved_start
         global time_data_recieved_and_loaded
         time_data_recieved_start = time.time()
-        print("length recieving data" , len(data))
         time_fec_starts = 0
         if (fec > 0):
             rs = reedsolo.RSCodec(fec)
@@ -210,7 +210,6 @@ original_time = None
 time_data_recieved_start = None
 time_timesync_ended = None
 time_timesync_started = None
-protocol_start_time = time.time()
 
 
 
