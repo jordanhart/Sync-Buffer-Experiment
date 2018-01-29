@@ -112,7 +112,7 @@ class EchoClientProtocol:
         global time_data_recieved_start
         global time_data_recieved_and_loaded
         time_data_recieved_start = time.time()
-        rs = reedsolo.RSCodec(10)
+        rs = reedsolo.RSCodec(1)
         time_fec_starts = time.time()
         json_data =  rs.decode(data)
         time_json_start = time.time()
