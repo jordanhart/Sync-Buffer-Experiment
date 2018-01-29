@@ -13,6 +13,7 @@ time_delay_transmitter_timestamps = 0
 network_delay_transmitter_to_client_over_udp = 0
 data = None
 json_data = None
+fec = 0
 
 
 def data_generator(original_time, fps):
@@ -38,11 +39,16 @@ class EchoServerProtocol:
         message = data.decode()
         # print('Received %r from %s' % (message, addr))
         # print("sending json_data", json_data)
-        rs = reedsolo.RSCodec(1)
-        reed_data = rs.encode(json_data)
-        if network_delay_transmitter_to_client_over_udp > 0:
-            time.sleep(network_delay_transmitter_to_client_over_udp)
-        self.transport.sendto(reed_data, addr)
+        if (fec > 0):
+            rs = reedsolo.RSCodec(1)
+            reed_data = rs.encode(json_data)
+            if network_delay_transmitter_to_client_over_udp > 0:
+                time.sleep(network_delay_transmitter_to_client_over_udp)
+            self.transport.sendto(reed_data, addr)
+        else:
+            if network_delay_transmitter_to_client_over_udp > 0:
+                time.sleep(network_delay_transmitter_to_client_over_udp)
+            self.transport.sendto(json_data, addr)
         # print('Received %r from %s' % (message, addr))
         # print('Send %r to %s' % (message, addr))
         # self.transport.sendto(data, addr)
@@ -67,7 +73,8 @@ class EchoServerControllerProtocol(asyncio.Protocol):
         # print('Send: {!r}'.format(message))
         # self.transport.write(data)
         data = data_generator(original_time, fps)
-        json_data = json.dumps(data)
+        json_data = json.dumps(data).encode()
+        print(len(json_data))
         # print("json_data", json_data)
         # print("json_data in control server not None: ", json_data!= None)
         

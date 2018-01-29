@@ -13,6 +13,7 @@ tick_length = .01
 latency_time_allowed = .01 #second, target for ml models
 e = latency_time_allowed / tick_length
 time_delay_client_timestamps = 0
+fec = 0
 
 def data_generator(original_time, fps):
   current_time = time.time()
@@ -112,11 +113,14 @@ class EchoClientProtocol:
         global time_data_recieved_start
         global time_data_recieved_and_loaded
         time_data_recieved_start = time.time()
-        rs = reedsolo.RSCodec(1)
-        time_fec_starts = time.time()
-        json_data =  rs.decode(data)
+        print("length recieving data" , len(data))
+        time_fec_starts = 0
+        if (fec > 0):
+            rs = reedsolo.RSCodec(fec)
+            time_fec_starts = time.time()
+            data =  rs.decode(data)
         time_json_start = time.time()
-        original_message = json.loads(json_data)
+        original_message = json.loads(data.decode())
         time_for_fec_and_dejson_end = time.time()
         if addr not in self.qs.keys():
             self.qs[addr] = queue.PriorityQueue(maxsize = 2000)
