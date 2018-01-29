@@ -85,7 +85,7 @@ class EchoServerControllerProtocol(asyncio.Protocol):
 
 
         # print('Close the client socket')
-        # self.transport.close()
+        self.transport.close()
     def request_to_sync_message(self, message):
         return message == "request to sync time"
 

@@ -10,10 +10,11 @@ import reedsolo
 fps = [30, 30, 30]
 timeout_time = 5
 tick_length = .01
-latency_time_allowed = .01 #second, target for ml models
+latency_time_allowed = .05 #second, target for ml models
 e = latency_time_allowed / tick_length
 time_delay_client_timestamps = 0
 fec = 0
+print("fps ", fps)
 
 def data_generator(original_time, fps):
   current_time = time.time()
@@ -196,8 +197,9 @@ def analyze_tuples(t, end_time, time_data_recieved_start, \
     print("seconds from udp connection made to data transfered, loaded in original form, and in queue: ", time_data_recieved_and_loaded - udp_time_start)
     print("seconds from udp connection made to data recieved : ", time_data_recieved_start - udp_time_start)
     print("seconds from udp data transfered to data in queue : ", time_data_recieved_and_loaded - time_data_recieved_start)
-    print("time json: ", time_for_fec_and_dejson_end - time_json_start)
-    print("time fec: ", time_json_start - time_fec_starts)
+    print("seconds to decode json: ", time_for_fec_and_dejson_end - time_json_start)
+    if (fec > 0):
+        print("time fec: ", time_json_start - time_fec_starts)
     print("seconds for packet sync code to run :", end_time - time_packet_sync_start)
     print("seconds for experiment to run", end_time - protocol_start_time)
     print("average tuples / frames per second combining local and remote: ",len(t)/ (len(fps)))
