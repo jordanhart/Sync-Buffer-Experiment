@@ -40,7 +40,7 @@ class EchoServerProtocol:
         # print('Received %r from %s' % (message, addr))
         # print("sending json_data", json_data)
         if (fec > 0):
-            rs = reedsolo.RSCodec(1)
+            rs = reedsolo.RSCodec(fec)
             reed_data = rs.encode(json_data)
             if network_delay_transmitter_to_client_over_udp > 0:
                 time.sleep(network_delay_transmitter_to_client_over_udp)
@@ -125,6 +125,6 @@ def start_server():
        pass
 
    transport.close()
-   # loop.close()
+   loop.close()
    # start_server()
 start_server()

@@ -145,7 +145,7 @@ class EchoClientProtocol:
     def connection_lost(self, exc):
         print('The server closed the connection')
         print('Stop the event loop')
-        self.loop.stop()
+        # self.loop.stop()
 
 
 
@@ -180,6 +180,12 @@ class ControllerClientProtocol(asyncio.Protocol):
         print('The server closed the connection')
         print('Stop the event loop')
         self.loop.stop()
+
+# def keep_track_of_tuples(t, end_time, time_data_recieved_start, \
+#     time_data_recieved_and_loaded, time_packet_sync_start, \
+#     time_for_fec_and_dejson_end, time_fec_starts, time_json_start):
+#     lst_end_time.append(end_time)
+#     lst_time_data_recieved_start.append(time_data_recieved_start):
 def analyze_tuples(t, end_time, time_data_recieved_start, \
     time_data_recieved_and_loaded, time_packet_sync_start, \
     time_for_fec_and_dejson_end, time_fec_starts, time_json_start):
@@ -206,24 +212,24 @@ protocol_start_time = time.time()
 
 
 
-
-loop = asyncio.get_event_loop()
-message = 'Hello World!'
-coro = loop.create_connection(lambda: ControllerClientProtocol(message, loop),
+def run_test():
+    loop = asyncio.get_event_loop()
+    message = 'Hello World!'
+    coro = loop.create_connection(lambda: ControllerClientProtocol(message, loop),
                               '127.0.0.1', 8889)
-client = loop.run_until_complete(coro)
-loop.run_forever()
+    client = loop.run_until_complete(coro)
+    loop.run_forever()
 # loop.close()
 
 
 # loop = asyncio.new_event_loop()
-message = "udp message!"
-connect = loop.create_datagram_endpoint(
-    lambda: EchoClientProtocol(message, loop),
-    remote_addr=('127.0.0.1', 9999))
-transport, protocol = loop.run_until_complete(connect)
-loop.run_forever()
-transport.close()
-loop.close()
-
+    message = "udp message!"
+    connect = loop.create_datagram_endpoint(
+        lambda: EchoClientProtocol(message, loop),
+        remote_addr=('127.0.0.1', 9999))
+    transport, protocol = loop.run_until_complete(connect)
+    loop.run_forever()
+    transport.close()
+    loop.close()
+run_test()
 
