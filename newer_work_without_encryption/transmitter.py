@@ -74,7 +74,6 @@ class EchoServerControllerProtocol(asyncio.Protocol):
         # self.transport.write(data)
         data = data_generator(original_time, fps)
         json_data = json.dumps(data).encode()
-        print(len(json_data))
         # print("json_data", json_data)
         # print("json_data in control server not None: ", json_data!= None)
         
