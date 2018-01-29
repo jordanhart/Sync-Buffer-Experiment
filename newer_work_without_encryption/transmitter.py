@@ -7,7 +7,7 @@ import reedsolo
 
 
 pqs=[]
-fps = [21, 40, 30]
+fps = [30, 30, 30]
 tick_length = .01
 time_delay_transmitter_timestamps = 0
 network_delay_transmitter_to_client_over_udp = 0
