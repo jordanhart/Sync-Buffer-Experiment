@@ -37,17 +37,8 @@ func main() {
 
 	server.Get("/time", func(req canopus.Request) canopus.Response {
 		now := time.Now()
-
-		// type json_format struct {
-  //           j []byte
-  //       }
-
-  //       func (j *json_format) GetBytes() []byte {
-  //          return j.j
-  //       }
         currentPsuedoTime  := now.Sub(psuedo_time_start)
 		json_marshal, _ := json.Marshal(currentPsuedoTime)
-		// js := json_format{j: json_marshal}
 		msg := canopus.ContentMessage(req.GetMessage().GetMessageId(), canopus.MessageAcknowledgment)
 		msg.SetPayload(canopus.NewBytesPayload(json_marshal))
 		res := canopus.NewResponse(msg, nil)
