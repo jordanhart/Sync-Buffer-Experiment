@@ -7,6 +7,11 @@ import (
 	"encoding/json"
 )
 
+type time_tuple struct {
+    psuedotime time.Duration
+    data interface{}
+}
+
 func main() {
 	start := time.Now()
 	fmt.Println("Connecting to CoAP Server")
@@ -32,7 +37,7 @@ func main() {
 	fmt.Println(offset.Seconds())
 	fmt.Println("Time lapse: ")
 	fmt.Println(finish_timesync.Sub(start))
-	
+
 	tok, err := conn.ObserveResource("/watch/this")
 	if err != nil {
 		panic(err.Error())
