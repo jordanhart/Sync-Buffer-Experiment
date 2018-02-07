@@ -9,9 +9,22 @@ import (
 	"strconv"
 )
 
+var psuedo_time_start time.Time
+
+type time_tuple struct {
+    psuedotime time.Duration
+    data interface{}
+}
+
+func getPsuedoTime() time.Duration {
+	now := time.Now()
+    currentPsuedoTime := now.Sub(psuedo_time_start)
+    return currentPsuedoTime
+}
+
 func main() {
 	server := canopus.NewServer()
-	psuedo_time_start := time.Now()
+	psuedo_time_start = time.Now()
 
 	// server.Get("/hello", func(req canopus.Request) canopus.Response {
 	// 	log.Println("Hello Called")
@@ -38,8 +51,9 @@ func main() {
 	// })
 
 	server.Get("/time", func(req canopus.Request) canopus.Response {
-		now := time.Now()
-        currentPsuedoTime  := now.Sub(psuedo_time_start)
+		// now := time.Now()
+  //       currentPsuedoTime  := now.Sub(psuedo_time_start)
+		currentPsuedoTime := getPsuedoTime()
 		json_marshal, _ := json.Marshal(currentPsuedoTime)
 		msg := canopus.ContentMessage(req.GetMessage().GetMessageId(), canopus.MessageAcknowledgment)
 		msg.SetPayload(canopus.NewBytesPayload(json_marshal))
@@ -59,7 +73,9 @@ func main() {
 			select {
 			case <-ticker.C:
 				changeVal := strconv.Itoa(rand.Int())
-				fmt.Println("[SERVER << ] Change of value -->", changeVal)
+				currentPsuedoTime := getPsuedoTime()
+				tuple := time_tuple{psuedotime: currentPsuedoTime, data:changeVal}
+				fmt.Println("[SERVER << ] Change of value -->", tuple)
 
 				server.NotifyChange("/watch/this", changeVal, false)
 			}
