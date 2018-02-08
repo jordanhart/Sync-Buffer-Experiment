@@ -64,8 +64,16 @@ func main() {
 						// msg := obsMsg.Msg\
 						resource := obsMsg.GetResource()
 						val := obsMsg.GetValue()
+						if str, ok := val.(string); ok { //trying to capture string json sent. TODO: Should change to send binary data for observe
+                             var tuple time_tuple
+                             json.Unmarshal([]byte(str), &tuple)
+                             fmt.Println("tuple is: ", val)
+                        } else {
+                             /* not string */
+                        	fmt.Println("[CLIENT >> ] Got Change Notification for resource and value: ", notifyCount, resource, val)
+                        }
 
-						fmt.Println("[CLIENT >> ] Got Change Notification for resource and value: ", notifyCount, resource, val)
+
 					}
 				} else {
 					done <- true

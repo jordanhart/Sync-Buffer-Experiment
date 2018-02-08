@@ -12,8 +12,8 @@ import (
 var psuedo_time_start time.Time
 
 type time_tuple struct {
-    psuedotime time.Duration
-    data interface{}
+    Psuedotime time.Duration
+    Data interface{}
 }
 
 func getPsuedoTime() time.Duration {
@@ -74,10 +74,10 @@ func main() {
 			case <-ticker.C:
 				changeVal := strconv.Itoa(rand.Int())
 				currentPsuedoTime := getPsuedoTime()
-				tuple := time_tuple{psuedotime: currentPsuedoTime, data:changeVal}
-				fmt.Println("[SERVER << ] Change of value -->", tuple)
-
-				server.NotifyChange("/watch/this", changeVal, false)
+				tuple := time_tuple{Psuedotime: currentPsuedoTime, Data:changeVal}
+                json_tuple , _:= json.Marshal(tuple)
+                fmt.Println("[SERVER << ] Change of value -->", string(json_tuple))
+				server.NotifyChange("/watch/this",string(json_tuple) , false) //TODO: change later to take in binary input, and insert json of time_tuple. Might require making new NotifyChange function in server.go
 			}
 		}
 	}()
