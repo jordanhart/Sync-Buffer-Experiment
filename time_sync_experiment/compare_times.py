@@ -7,7 +7,7 @@ tick_length = .0001
 client_times = np.load('client_times.npy')
 server_times = np.load('server_times.npy')
 
-time_diffs = (client_times - server_times) * tick_length
+time_diffs = np.abs(client_times - server_times) * tick_length
 plt.plot(time_diffs)
 plt.savefig('time_differences.png')
 print("average time diff: ", np.average(time_diffs))
