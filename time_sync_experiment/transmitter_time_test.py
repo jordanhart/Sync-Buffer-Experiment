@@ -1,81 +1,78 @@
-#udp server from https://docs.python.org/3/library/asyncio-protocol.html#udp-echo-client-protocol
+#defining packet as a list, in order of 
+#(for data packet) protocol code, session ID, Time Stamp, Flag, Payload Size
+#(for control packet) protocol code, session ID, Opcode, Payload size
 
-import asyncio
-import time
+import socket  
+import time    
 import numpy as np
-
-
 protocol_start_time = time.time()
 tick_length = .0001
 times = []
-counter = 10 #update with number of trials
+counter_init = 100
+counter = counter_init #update with number of trials
+BUFFER_SIZE = 20  # Normally 1024, but we want fast response
 
-class EchoServerControllerProtocol(asyncio.Protocol):
-    def connection_made(self, transport):
-        peername = transport.get_extra_info('peername')
-        # print('Connection from {}'.format(peername))
-        self.transport = transport
-        self.tick_length = tick_length
+def start_server(s, port = 1253):
+    global counter
+    global protocol_start_time
+    #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
+    # next create a socket object
+    print("Socket successfully created")
 
-    def data_received(self, data):
-        global protocol_start_time
-        global counter
-        message = data.decode()
-        original_time = time.time()
-        if (self.request_to_sync_message(message)):
-            self.transport.write(str((time.time() - original_time)//self.tick_length).encode())
-            while (time.time() - protocol_start_time < 3):
+    # reserve a port on your computer in our
+    # case it is 12345 but it can be anything
+
+
+    # Next bind to the port
+    # we have not typed any ip in the ip field
+    # instead we have inputted an empty string
+    # this makes the server listen to requests 
+    # coming from other computers on the network
+    s.bind(('127.0.0.1', port))        
+    print("socket binded to %s" %(port))
+
+    # put the socket into listening mode
+    s.listen(1)     
+    print("socket is listening")
+
+    # a forever loop until we interrupt it or 
+    # an error occurs
+    original_time = None  
+
+    def send_time(s):#s is a socket
+        psuedotime=(time.time() - original_time)//tick_length
+        s.send(str(psuedotime).encode("utf-8")) #sending current psuedotime
+        return original_time  
+
+    while (counter > 0):
+       # Establish connection with client.
+       c, addr = s.accept()     
+       print('Got connection from', addr)
+       print('c', c)
+
+       data = c.recv(BUFFER_SIZE)
+       # t = s.recv(1024)
+       # original_time = time.time() - int(t) * tick_length
+       if (original_time == None):
+          original_time = time.time()
+          send_time(c)
+          while (time.time() - protocol_start_time < 3):
         	    continue
-            times.append((time.time() - original_time)//self.tick_length)
-            protocol_start_time = time.time()
-            counter -= 1
+          times.append((time.time() - original_time)//tick_length)
+          counter -= 1
+          print("server counter: ", counter)
+          protocol_start_time = time.time()
+          original_time = None
+      
 
-        # print('Data received: {!r}'.format(message))
+       # Close the connection with the client
+       c.close()                         
 
-        # print('Send: {!r}'.format(message))
-        # self.transport.write(data)
-        # print("json_data", json_data)
-        # print("json_data in control server not None: ", json_data!= None)
-        
-        # print('Close the client socket')
-        self.transport.close()
-    def connection_lost(self, exc):
-        # The socket has been closed, stop the event loop
-        # loop.stop()
-        if (counter <= 0):
-        	loop.stop()
-        	raise KeyboardInterrupt()
-
-
-        print('Close the client socket')
-        # self.transport.close()
-    def request_to_sync_message(self, message):
-        return message == "request to sync time"
-
-def start_server():
-   global loop
-   global server
-   loop = asyncio.get_event_loop()
-   # print("starting tcp server")
-   # Each client connection will create a new protocol instance
-   coro = loop.create_server(EchoServerControllerProtocol, '127.0.0.1', 8888)
-   server = loop.run_until_complete(coro)
-
-   # Serve requests until Ctrl+C is pressed
-   # print('Serving on {}'.format(server.sockets[0].getsockname()))
-   try:
-       loop.run_forever()
-   except KeyboardInterrupt:
        times_array = np.array(times)
        np.save("server_times", times_array)
-       # loop.stop()
-       server.close()
-       loop.close()
 
-       pass
-    
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+start_server(s)
 
-   # # Close the server
-   # if (time.time() - protocol_start_time > 6 * 10):
+#stripped down synchronized reciever instance
 
-start_server()
