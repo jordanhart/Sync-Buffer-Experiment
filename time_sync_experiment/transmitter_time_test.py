@@ -8,7 +8,7 @@ import numpy as np
 protocol_start_time = time.time()
 tick_length = .0001
 times = []
-counter_init = 100
+counter_init = 1000
 counter = counter_init #update with number of trials
 BUFFER_SIZE = 20  # Normally 1024, but we want fast response
 
@@ -60,7 +60,7 @@ def start_server(s, port = 1253):
         	    continue
           times.append((time.time() - original_time)//tick_length)
           counter -= 1
-          print("server counter: ", counter)
+          print("server counter: ", counter_init - counter)
           protocol_start_time = time.time()
           original_time = None
       

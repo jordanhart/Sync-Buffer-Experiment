@@ -41,7 +41,7 @@ def recieve_data(port = 1253):
 
     s.close()
 
-for i in range(100):
+for i in range(1000):
     recieve_data()
 times_array = np.array(times)
 np.save("client_times", times_array)
