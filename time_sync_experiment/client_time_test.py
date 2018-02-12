@@ -15,10 +15,10 @@ tick_length = .0001
 server_ip = '127.0.0.1'
 BUFFER_SIZE = 1024
 
+time.sleep(1)
 
 
-
-def recieve_data(port = 1253):
+def recieve_data(port = 1257):
     #testing with only 1 transmitter
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
     global counter

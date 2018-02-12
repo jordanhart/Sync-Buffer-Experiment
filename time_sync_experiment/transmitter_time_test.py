@@ -12,7 +12,7 @@ counter_init = 1000
 counter = counter_init #update with number of trials
 BUFFER_SIZE = 20  # Normally 1024, but we want fast response
 
-def start_server(s, port = 1253):
+def start_server(s, port = 1257):
     global counter
     global protocol_start_time
     #socket code from https://pythontips.com/2013/08/06/python-socket-network-programming/
@@ -34,6 +34,8 @@ def start_server(s, port = 1253):
     # put the socket into listening mode
     s.listen(1)     
     print("socket is listening")
+
+    time.sleep(1)
 
     # a forever loop until we interrupt it or 
     # an error occurs
